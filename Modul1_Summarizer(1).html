@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rangkuman Jaringan Nirkabel — Modul 1 & 2</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Sora:wght@300;400;600;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0e1a;
+    --surface: #111827;
+    --card: #161f33;
+    --border: #1e2d4a;
+    --accent1: #00d4ff;
+    --accent2: #7c3aed;
+    --accent3: #10b981;
+    --accent4: #f59e0b;
+    --accent5: #ef4444;
+    --text: #e2e8f0;
+    --muted: #64748b;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Sora', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(0,212,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,212,255,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+  .container { max-width: 1100px; margin: 0 auto; padding: 0 24px; position: relative; z-index: 1; }
+
+  header { padding: 60px 0 32px; text-align: center; }
+  .badge {
+    display: inline-block;
+    background: linear-gradient(135deg, var(--accent2), var(--accent1));
+    color: white; font-family: 'Space Mono', monospace; font-size: 11px;
+    letter-spacing: 3px; padding: 6px 16px; border-radius: 20px; margin-bottom: 20px; text-transform: uppercase;
+  }
+  h1 {
+    font-size: clamp(26px, 4.5vw, 48px); font-weight: 800; line-height: 1.1;
+    background: linear-gradient(135deg, #fff 30%, var(--accent1));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 10px;
+  }
+  .subtitle { color: var(--muted); font-size: 14px; font-weight: 300; }
+
+  .module-switcher { display: flex; justify-content: center; gap: 12px; margin: 32px 0 0; flex-wrap: wrap; }
+  .mod-btn {
+    background: var(--surface); border: 1px solid var(--border); color: var(--muted);
+    padding: 12px 24px; border-radius: 10px; cursor: pointer;
+    font-family: 'Space Mono', monospace; font-size: 12px; letter-spacing: 1px; transition: all 0.25s; font-weight: 700;
+  }
+  .mod-btn:hover { border-color: var(--accent1); color: var(--accent1); }
+  .mod-btn.active {
+    background: linear-gradient(135deg, rgba(0,212,255,0.18), rgba(124,58,237,0.18));
+    border-color: var(--accent1); color: white; box-shadow: 0 0 24px rgba(0,212,255,0.15);
+  }
+
+  .module-panel { display: none; }
+  .module-panel.active { display: block; animation: fadeIn 0.3s ease; }
+
+  .nav-tabs {
+    display: flex; gap: 8px; padding: 24px 0; overflow-x: auto;
+    scrollbar-width: none; flex-wrap: wrap; justify-content: center;
+  }
+  .nav-tab {
+    background: var(--surface); border: 1px solid var(--border); color: var(--muted);
+    padding: 9px 16px; border-radius: 8px; cursor: pointer;
+    font-family: 'Space Mono', monospace; font-size: 11px; letter-spacing: 0.5px;
+    white-space: nowrap; transition: all 0.2s; display: flex; align-items: center; gap: 7px;
+  }
+  .nav-tab:hover { border-color: var(--accent1); color: var(--accent1); }
+  .nav-tab.active {
+    background: linear-gradient(135deg, rgba(0,212,255,0.12), rgba(124,58,237,0.12));
+    border-color: var(--accent1); color: var(--accent1);
+  }
+  .dot { width: 7px; height: 7px; border-radius: 50%; display: inline-block; flex-shrink: 0; }
+
+  .section { display: none; }
+  .section.active { display: block; animation: fadeIn 0.3s ease; }
+  @keyframes fadeIn { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+
+  .section-header {
+    background: var(--card); border: 1px solid var(--border); border-radius: 16px;
+    padding: 26px 30px; margin-bottom: 20px; position: relative; overflow: hidden;
+  }
+  .section-header::before {
+    content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%;
+    background: linear-gradient(180deg, var(--accent1), var(--accent2)); border-radius: 4px 0 0 4px;
+  }
+  .section-title { font-size: 20px; font-weight: 700; color: white; margin-bottom: 7px; }
+  .section-desc { color: var(--muted); font-size: 13px; line-height: 1.6; }
+
+  .cards-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 14px; margin-bottom: 20px; }
+  .card {
+    background: var(--card); border: 1px solid var(--border); border-radius: 14px;
+    padding: 22px; transition: border-color 0.2s, transform 0.2s;
+  }
+  .card:hover { border-color: var(--accent1); transform: translateY(-2px); }
+  .card-icon { font-size: 26px; margin-bottom: 12px; }
+  .card-title { font-size: 14px; font-weight: 700; color: white; margin-bottom: 9px; }
+  .card-body { font-size: 13px; color: #94a3b8; line-height: 1.7; }
+
+  .pro-con-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 20px; }
+  @media (max-width: 600px) { .pro-con-grid { grid-template-columns: 1fr; } }
+  .pro-box, .con-box { background: var(--card); border-radius: 14px; padding: 22px; border: 1px solid var(--border); }
+  .pro-box { border-top: 3px solid var(--accent3); }
+  .con-box { border-top: 3px solid var(--accent5); }
+  .box-title { font-weight: 700; font-size: 13px; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+  .pro-box .box-title { color: var(--accent3); }
+  .con-box .box-title { color: var(--accent5); }
+  .item-list { list-style: none; }
+  .item-list li { font-size: 13px; color: #94a3b8; padding: 8px 0; border-bottom: 1px solid var(--border); display: flex; gap: 10px; align-items: flex-start; line-height: 1.5; }
+  .item-list li:last-child { border-bottom: none; }
+  .item-list li span.ico { flex-shrink: 0; font-size: 14px; }
+
+  .formula-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 12px; margin-bottom: 20px; }
+  .formula-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 18px; text-align: center; }
+  .formula-label { font-size: 10px; font-family: 'Space Mono', monospace; color: var(--muted); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 12px; }
+  .formula { font-family: 'Space Mono', monospace; font-size: 19px; font-weight: 700; color: var(--accent1); margin-bottom: 10px; padding: 10px; background: rgba(0,212,255,0.06); border-radius: 8px; }
+  .formula-desc { font-size: 12px; color: #64748b; line-height: 1.6; }
+
+  .mod-table { width: 100%; border-collapse: separate; border-spacing: 0 7px; margin-bottom: 20px; }
+  .mod-table th { font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: 2px; color: var(--muted); text-transform: uppercase; padding: 7px 14px; text-align: left; }
+  .mod-table td { background: var(--card); padding: 13px 14px; font-size: 13px; color: #94a3b8; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+  .mod-table td:first-child { border-left: 1px solid var(--border); border-radius: 10px 0 0 10px; font-weight: 700; color: white; font-family: 'Space Mono', monospace; font-size: 11px; }
+  .mod-table td:last-child { border-right: 1px solid var(--border); border-radius: 0 10px 10px 0; }
+  .mod-tag { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; font-family: 'Space Mono', monospace; }
+  .tag-amp { background: rgba(245,158,11,0.15); color: var(--accent4); }
+  .tag-freq { background: rgba(0,212,255,0.1); color: var(--accent1); }
+  .tag-phase { background: rgba(124,58,237,0.15); color: #a78bfa; }
+
+  .highlight-box {
+    background: linear-gradient(135deg, rgba(0,212,255,0.07), rgba(124,58,237,0.07));
+    border: 1px solid rgba(0,212,255,0.18); border-radius: 14px; padding: 22px; margin-bottom: 20px;
+  }
+  .highlight-box h3 { font-size: 13px; color: var(--accent1); font-family: 'Space Mono', monospace; letter-spacing: 1px; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+  .highlight-box p { font-size: 13px; color: #94a3b8; line-height: 1.8; }
+
+  .compare-block { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 20px; }
+  @media (max-width: 640px) { .compare-block { grid-template-columns: 1fr; } }
+  .mod-card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 20px; text-align: center; position: relative; overflow: hidden; transition: transform 0.2s; }
+  .mod-card:hover { transform: translateY(-3px); }
+  .mod-card::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 3px; }
+  .mod-card.am::after { background: var(--accent4); }
+  .mod-card.fm::after { background: var(--accent1); }
+  .mod-card.pm::after { background: #a78bfa; }
+  .mod-card.ask::after { background: var(--accent4); }
+  .mod-card.fsk::after { background: var(--accent3); }
+  .mod-card.psk::after { background: #a78bfa; }
+  .mod-card-name { font-family: 'Space Mono', monospace; font-size: 20px; font-weight: 700; color: white; margin-bottom: 4px; }
+  .mod-card-full { font-size: 11px; color: var(--muted); margin-bottom: 14px; }
+  .mod-card-changes { font-size: 12px; color: #94a3b8; margin-bottom: 10px; }
+  .mod-card-changes strong { color: var(--accent1); }
+  .mod-card-note { font-size: 11px; color: var(--muted); line-height: 1.6; background: rgba(255,255,255,0.03); padding: 8px; border-radius: 8px; }
+
+  .keypoints { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 22px; margin-bottom: 20px; }
+  .keypoints h3 { font-size: 12px; font-family: 'Space Mono', monospace; color: var(--accent4); letter-spacing: 2px; margin-bottom: 14px; }
+  .kp-item { display: flex; gap: 12px; align-items: flex-start; padding: 11px 0; border-bottom: 1px solid var(--border); font-size: 13px; color: #94a3b8; line-height: 1.6; }
+  .kp-item:last-child { border-bottom: none; }
+  .kp-num { font-family: 'Space Mono', monospace; font-size: 11px; color: var(--accent1); background: rgba(0,212,255,0.1); width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+
+  .gen-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin-bottom: 20px; }
+  .gen-card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 20px; position: relative; overflow: hidden; }
+  .gen-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; }
+  .gen-card.g1::before { background: #64748b; }
+  .gen-card.g2::before { background: var(--accent3); }
+  .gen-card.g3::before { background: var(--accent1); }
+  .gen-card.g35::before { background: var(--accent2); }
+  .gen-label { font-family: 'Space Mono', monospace; font-size: 18px; font-weight: 700; color: white; margin-bottom: 4px; }
+  .gen-name { font-size: 11px; color: var(--muted); margin-bottom: 12px; }
+  .gen-body { font-size: 12px; color: #94a3b8; line-height: 1.7; }
+
+  .ma-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; margin-bottom: 20px; }
+  @media (max-width:640px) { .ma-grid { grid-template-columns:1fr; } }
+  .ma-card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 20px; text-align: center; transition: border-color 0.2s; }
+  .ma-card:hover { border-color: var(--accent1); }
+  .ma-name { font-family: 'Space Mono', monospace; font-size: 17px; font-weight: 700; color: white; margin-bottom: 4px; }
+  .ma-full { font-size: 10px; color: var(--muted); margin-bottom: 14px; letter-spacing: 0.5px; }
+  .ma-analogy { font-size: 20px; margin-bottom: 10px; }
+  .ma-desc { font-size: 12px; color: #94a3b8; line-height: 1.6; }
+
+  .range-bar-wrap { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 22px; margin-bottom: 20px; }
+  .range-bar-wrap h3 { font-size: 12px; font-family: 'Space Mono', monospace; color: var(--muted); letter-spacing: 2px; margin-bottom: 18px; }
+  .range-item { margin-bottom: 14px; }
+  .range-label { display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 6px; }
+  .range-label span:first-child { color: white; font-weight: 600; }
+  .range-label span:last-child { color: var(--muted); font-family: 'Space Mono', monospace; font-size: 11px; }
+  .range-track { background: rgba(255,255,255,0.06); border-radius: 4px; height: 8px; overflow: hidden; }
+  .range-fill { height: 100%; border-radius: 4px; }
+
+  footer { text-align: center; padding: 40px 0; font-size: 11px; color: var(--muted); font-family: 'Space Mono', monospace; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <header>
+    <div class="badge">📡 Panduan Belajar Interaktif</div>
+    <h1>Jaringan Nirkabel<br>& Teknologi Wireless</h1>
+    <p class="subtitle">Rangkuman Lengkap Modul 1 & 2 — Dasar Nirkabel, Gelombang, dan Jenis Teknologi</p>
+    <div class="module-switcher">
+      <button class="mod-btn active" onclick="showModule('m1', this)">📡 Modul 1 — Dasar & Gelombang Radio</button>
+      <button class="mod-btn" onclick="showModule('m2', this)">📶 Modul 2 — Jenis Teknologi Nirkabel</button>
+    </div>
+  </header>
+
+  <!-- ═══════════ MODUL 1 ═══════════ -->
+  <div class="module-panel active" id="m1">
+    <div class="nav-tabs">
+      <button class="nav-tab active" onclick="showSection('m1','jarnir',this)"><span class="dot" style="background:#00d4ff"></span> Jaringan Nirkabel</button>
+      <button class="nav-tab" onclick="showSection('m1','gelombang',this)"><span class="dot" style="background:#10b981"></span> Gelombang Radio</button>
+      <button class="nav-tab" onclick="showSection('m1','frekuensi',this)"><span class="dot" style="background:#f59e0b"></span> Frekuensi & Panjang λ</button>
+      <button class="nav-tab" onclick="showSection('m1','analog',this)"><span class="dot" style="background:#a78bfa"></span> Modulasi Analog</button>
+      <button class="nav-tab" onclick="showSection('m1','digital',this)"><span class="dot" style="background:#ef4444"></span> Modulasi Digital</button>
+      <button class="nav-tab" onclick="showSection('m1','rangkuman1',this)"><span class="dot" style="background:#f59e0b"></span> Rangkuman & Tips</button>
+    </div>
+
+    <div class="section active" id="m1-jarnir">
+      <div class="section-header">
+        <div class="section-title">📡 A. Dasar Jaringan Nirkabel</div>
+        <div class="section-desc">Teknologi pertukaran data tanpa kabel menggunakan gelombang radio, gelombang mikro, atau cahaya infrared.</div>
+      </div>
+      <div class="cards-grid">
+        <div class="card"><div class="card-icon">🔌</div><div class="card-title">Pengertian Dasar</div><div class="card-body">Menghubungkan sistem komputer tanpa kabel. Prinsipnya sama dengan jaringan Ethernet card biasa.</div></div>
+        <div class="card"><div class="card-icon">📶</div><div class="card-title">Access Point (AP)</div><div class="card-body">Fungsinya seperti <strong style="color:#00d4ff">hub</strong> pada jaringan kabel. Tanpa AP, komputer bisa langsung peer-to-peer (seperti kabel cross-over).</div></div>
+        <div class="card"><div class="card-icon">🌐</div><div class="card-title">Media Transmisi</div><div class="card-body"><strong style="color:#00d4ff">Gelombang Radio</strong>, <strong style="color:#10b981">Gelombang Mikro</strong>, <strong style="color:#a78bfa">Cahaya Infrared</strong>. Contoh: Bluetooth, WiFi, Remote TV.</div></div>
+      </div>
+      <div class="pro-con-grid">
+        <div class="pro-box">
+          <div class="box-title">✅ Keunggulan</div>
+          <ul class="item-list">
+            <li><span class="ico">🚶</span><div><strong>Mobilitas Tinggi</strong> — Akses dari mana saja dalam jangkauan jaringan (hotspot, kantor, publik)</div></li>
+            <li><span class="ico">⚡</span><div><strong>Instalasi Mudah & Cepat</strong> — Tidak perlu menarik kabel ke tiap komputer</div></li>
+            <li><span class="ico">🔧</span><div><strong>Lebih Fleksibel</strong> — Bisa dibangun di tempat yang sulit dijangkau kabel</div></li>
+            <li><span class="ico">📈</span><div><strong>Meningkatkan Produktivitas</strong> — Karyawan bisa merespons lebih cepat dari mana pun</div></li>
+          </ul>
+        </div>
+        <div class="con-box">
+          <div class="box-title">❌ Kelemahan</div>
+          <ul class="item-list">
+            <li><span class="ico">🔓</span><div><strong>Keamanan Rentan</strong> — Transmisi lewat udara bisa disadap siapa saja</div></li>
+            <li><span class="ico">🐢</span><div><strong>Kecepatan Terbatas</strong> — 11–54 Mbps (aktual 11–24 Mbps), dipengaruhi cuaca</div></li>
+            <li><span class="ico">💸</span><div><strong>Biaya Awal Tinggi</strong> — Komponen nirkabel masih mahal, butuh perencanaan</div></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="section" id="m1-gelombang">
+      <div class="section-header">
+        <div class="section-title">📻 Gelombang Radio</div>
+        <div class="section-desc">Radiasi elektromagnetik yang menjadi media transmisi utama pada jaringan nirkabel. Merambat di udara maupun ruang hampa tanpa medium pengangkut.</div>
+      </div>
+      <div class="cards-grid">
+        <div class="card"><div class="card-icon">⚡</div><div class="card-title">Sifat Gelombang Radio</div><div class="card-body">Terbentuk saat objek bermuatan listrik dimodulasi pada frekuensi RF. Bergerak melalui osilasi elektrik dan magnetik. Tidak perlu medium pengangkut (bisa di ruang hampa).</div></div>
+        <div class="card"><div class="card-icon">📊</div><div class="card-title">Pengelompokan Frekuensi</div><div class="card-body">Dimulai dari <strong style="color:#00d4ff">30 kHz ke atas</strong>, dikelompokkan berdasarkan lebar frekuensi. Panjang gelombang tinggi = frekuensi rendah.</div></div>
+        <div class="card"><div class="card-icon">🔄</div><div class="card-title">Hubungan λ dan f</div><div class="card-body"><strong style="color:#f59e0b">Berbanding terbalik!</strong> Panjang gelombang ↑ → Frekuensi ↓ dan sebaliknya.</div></div>
+      </div>
+      <div class="highlight-box">
+        <h3>⚡ INGAT</h3>
+        <p>Gelombang radio tidak memerlukan molekul udara sebagai perantara — bisa merambat di udara <em>dan</em> di ruang angkasa yang hampa udara.</p>
+      </div>
+    </div>
+
+    <div class="section" id="m1-frekuensi">
+      <div class="section-header">
+        <div class="section-title">📐 B. Frekuensi & Panjang Gelombang</div>
+        <div class="section-desc">Dua besaran utama yang saling berhubungan secara matematis dan berbanding terbalik satu sama lain.</div>
+      </div>
+      <div class="formula-grid">
+        <div class="formula-card"><div class="formula-label">Rumus 1 — Periode</div><div class="formula">f = 1 / T</div><div class="formula-desc"><strong>f</strong> = frekuensi (Hz) | <strong>T</strong> = periode (sekon)<br>1 Hz = 1 kejadian per detik</div></div>
+        <div class="formula-card"><div class="formula-label">Rumus 2 — Getaran</div><div class="formula">f = n / t</div><div class="formula-desc"><strong>n</strong> = jumlah getaran | <strong>t</strong> = waktu (detik)</div></div>
+        <div class="formula-card"><div class="formula-label">Rumus 3 — Frekuensi</div><div class="formula">f = c / λ</div><div class="formula-desc"><strong>c</strong> = 300.000.000 m/s<br><strong>λ</strong> = panjang gelombang (m)</div></div>
+        <div class="formula-card"><div class="formula-label">Rumus 4 — Panjang Gelombang</div><div class="formula">λ = c / f</div><div class="formula-desc">Kebalikan dari rumus frekuensi.<br>c = 300.000.000 m/s</div></div>
+      </div>
+      <div class="highlight-box">
+        <h3>💡 KONSTANTA PENTING</h3>
+        <p><strong style="color:#00d4ff">c (kecepatan cahaya dalam vakum)</strong> ≈ <strong style="color:#fff">300.000.000 m/s</strong> → untuk gelombang radio/elektromagnetik<br><br>
+        <strong style="color:#10b981">c (kecepatan suara di udara)</strong> = 344 m/s pada 20°C → untuk gelombang suara saja<br><br>
+        Untuk soal jaringan nirkabel/gelombang radio, selalu gunakan <strong>c = 300.000.000 m/s</strong></p>
+      </div>
+    </div>
+
+    <div class="section" id="m1-analog">
+      <div class="section-header">
+        <div class="section-title">🎛️ C. Modulasi Analog</div>
+        <div class="section-desc">Proses menumpangkan sinyal informasi ke sinyal pembawa/carrier. Tiga parameter yang bisa diubah: Amplitudo, Frekuensi, atau Fasa.</div>
+      </div>
+      <div class="highlight-box">
+        <h3>📌 DEFINISI MODULASI</h3>
+        <p>Modulasi = proses perubahan gelombang periodik sehingga sinyal mampu membawa informasi. Parameter kunci: <strong style="color:#f59e0b">Amplitudo</strong>, <strong style="color:#00d4ff">Frekuensi</strong>, dan <strong style="color:#a78bfa">Fasa</strong>.</p>
+      </div>
+      <div class="compare-block">
+        <div class="mod-card am">
+          <div class="mod-card-name">AM</div><div class="mod-card-full">Amplitude Modulation</div>
+          <div class="mod-card-changes">Yang berubah: <strong>AMPLITUDO</strong></div>
+          <div class="mod-card-note">Frek. pemodulasi: 20 Hz–20 kHz<br>Frek. pembawa: 300 kHz–3 MHz<br><br>Amplitudo carrier berubah sesuai tegangan sinyal informasi.</div>
+        </div>
+        <div class="mod-card fm">
+          <div class="mod-card-name">FM</div><div class="mod-card-full">Frequency Modulation</div>
+          <div class="mod-card-changes">Yang berubah: <strong>FREKUENSI</strong></div>
+          <div class="mod-card-note">Amplitudo carrier <strong>tetap</strong>.<br>Frekuensi berubah mengikuti amplitudo pemodulasi.<br><br>Lebih tahan noise dibanding AM.</div>
+        </div>
+        <div class="mod-card pm">
+          <div class="mod-card-name">PM</div><div class="mod-card-full">Phase Modulation</div>
+          <div class="mod-card-changes">Yang berubah: <strong>FASA</strong></div>
+          <div class="mod-card-note">Amplitudo & frekuensi tetap.<br><strong style="color:#ef4444">⚠ Jarang digunakan</strong> — hardware kompleks, ambigu fasa 0° vs 180°.</div>
+        </div>
+      </div>
+      <table class="mod-table">
+        <thead><tr><th>Jenis</th><th>Yang Berubah</th><th>Yang Tetap</th><th>Keterangan</th></tr></thead>
+        <tbody>
+          <tr><td>AM</td><td><span class="mod-tag tag-amp">Amplitudo</span></td><td>Frekuensi, Fasa</td><td>Carrier berubah sesuai tegangan sinyal info</td></tr>
+          <tr><td>FM</td><td><span class="mod-tag tag-freq">Frekuensi</span></td><td>Amplitudo, Fasa</td><td>Carrier berubah sesuai sinyal suara/info</td></tr>
+          <tr><td>PM</td><td><span class="mod-tag tag-phase">Fasa</span></td><td>Amplitudo, Frekuensi</td><td>Jarang dipakai, hardware kompleks</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="section" id="m1-digital">
+      <div class="section-header">
+        <div class="section-title">💻 D. Modulasi Digital</div>
+        <div class="section-desc">Proses menumpangkan sinyal digital (bit 0 dan 1) ke sinyal pembawa. Dengan mengamati sinyal pembawa, kita bisa mengetahui urutan bit yang dikirimkan.</div>
+      </div>
+      <div class="compare-block">
+        <div class="mod-card ask">
+          <div class="mod-card-name">ASK</div><div class="mod-card-full">Amplitude Shift Keying</div>
+          <div class="mod-card-changes">Yang berubah: <strong>AMPLITUDO</strong></div>
+          <div class="mod-card-note">Bit 1 = ada tegangan<br>Bit 0 = tegangan 0 volt<br><br>✅ Bit per baud lebih besar<br>❌ Hanya jarak dekat, rentan noise</div>
+        </div>
+        <div class="mod-card fsk">
+          <div class="mod-card-name">FSK</div><div class="mod-card-full">Frequency Shift Keying</div>
+          <div class="mod-card-changes">Yang berubah: <strong>FREKUENSI</strong></div>
+          <div class="mod-card-note">Output antara dua frekuensi (mark & space).<br><br>✅ <strong style="color:#10b981">Paling populer</strong><br>✅ Amplitudo tetap, lebih stabil</div>
+        </div>
+        <div class="mod-card psk">
+          <div class="mod-card-name">PSK</div><div class="mod-card-full">Phase Shift Keying</div>
+          <div class="mod-card-changes">Yang berubah: <strong>FASA</strong></div>
+          <div class="mod-card-note">Biner 0 = fasa sama<br>Biner 1 = fasa berlawanan (180°)<br><br>✅ Lebih efisien dari FSK<br>⚠ Butuh referensi fasa</div>
+        </div>
+      </div>
+      <table class="mod-table">
+        <thead><tr><th>Jenis</th><th>Yang Berubah</th><th>Bit 0</th><th>Bit 1</th><th>Catatan</th></tr></thead>
+        <tbody>
+          <tr><td>ASK</td><td><span class="mod-tag tag-amp">Amplitudo</span></td><td>Tegangan = 0V</td><td>Ada tegangan</td><td>Hanya jarak dekat, rentan noise</td></tr>
+          <tr><td>FSK</td><td><span class="mod-tag tag-freq">Frekuensi</span></td><td>Frekuensi space</td><td>Frekuensi mark</td><td>Paling populer, amplitudo tetap</td></tr>
+          <tr><td>PSK</td><td><span class="mod-tag tag-phase">Fasa</span></td><td>Fasa sama</td><td>Fasa berlawanan</td><td>Butuh referensi fasa, efisien</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="section" id="m1-rangkuman1">
+      <div class="section-header">
+        <div class="section-title">🎯 Rangkuman & Tips Ujian — Modul 1</div>
+        <div class="section-desc">Poin-poin paling penting dari Modul 1 yang sering muncul di soal ujian.</div>
+      </div>
+      <div class="keypoints">
+        <h3>🔑 POIN KUNCI MODUL 1</h3>
+        <div class="kp-item"><div class="kp-num">1</div><div>Access Point (AP) pada jaringan nirkabel <strong style="color:#00d4ff">setara dengan hub</strong> pada jaringan kabel berbasis Ethernet.</div></div>
+        <div class="kp-item"><div class="kp-num">2</div><div>Frekuensi dan panjang gelombang <strong style="color:#f59e0b">berbanding terbalik</strong> — λ ↑ maka f ↓, dan sebaliknya.</div></div>
+        <div class="kp-item"><div class="kp-num">3</div><div>Rumus utama: <strong style="color:#00d4ff">f = c/λ</strong> dan <strong style="color:#00d4ff">λ = c/f</strong>, dengan c = 300.000.000 m/s.</div></div>
+        <div class="kp-item"><div class="kp-num">4</div><div>AM mengubah <strong style="color:#f59e0b">Amplitudo</strong>, FM mengubah <strong style="color:#00d4ff">Frekuensi</strong>, PM mengubah <strong style="color:#a78bfa">Fasa</strong>.</div></div>
+        <div class="kp-item"><div class="kp-num">5</div><div>PM <strong style="color:#ef4444">jarang dipakai</strong> — hardware penerima lebih kompleks, bisa ambigu fasa 0° vs 180°.</div></div>
+        <div class="kp-item"><div class="kp-num">6</div><div>ASK cocok hanya untuk <strong style="color:#f59e0b">jarak dekat</strong> karena rentan terhadap noise dan redaman.</div></div>
+        <div class="kp-item"><div class="kp-num">7</div><div>FSK adalah modulasi digital <strong style="color:#10b981">paling populer</strong> — frekuensi berubah, amplitudo tetap.</div></div>
+        <div class="kp-item"><div class="kp-num">8</div><div>PSK: Biner 0 = fasa <strong>sama</strong>; Biner 1 = fasa <strong>berlawanan</strong> (180°).</div></div>
+        <div class="kp-item"><div class="kp-num">9</div><div>Kecepatan nirkabel: <strong style="color:#00d4ff">11–54 Mbps</strong> (aktual 11–24 Mbps), dipengaruhi cuaca & lingkungan.</div></div>
+        <div class="kp-item"><div class="kp-num">10</div><div>Gelombang radio <strong>tidak memerlukan medium pengangkut</strong> — bisa merambat di ruang hampa.</div></div>
+      </div>
+      <div class="cards-grid">
+        <div class="card"><div class="card-icon">🧩</div><div class="card-title">Cara Mudah Ingat Modulasi</div><div class="card-body"><strong style="color:#f59e0b">A</strong>M → <strong style="color:#f59e0b">A</strong>mplitudo berubah<br><strong style="color:#00d4ff">F</strong>M → <strong style="color:#00d4ff">F</strong>rekuensi berubah<br><strong style="color:#a78bfa">P</strong>M → <strong style="color:#a78bfa">P</strong>hase (fasa) berubah<br><br>Huruf pertama = parameter yang berubah!</div></div>
+        <div class="card"><div class="card-icon">📊</div><div class="card-title">Analog → Digital</div><div class="card-body">ASK ≈ AM (amplitudo)<br>FSK ≈ FM (frekuensi)<br>PSK ≈ PM (fasa)<br><br>Versi digital mengunci (shift) parameter pada nilai diskrit, bukan kontinu.</div></div>
+        <div class="card"><div class="card-icon">⚡</div><div class="card-title">Peer-to-Peer Nirkabel</div><div class="card-body">Tanpa Access Point, dua komputer nirkabel bisa terhubung langsung secara <strong style="color:#00d4ff">peer-to-peer</strong> — seperti kabel cross-over pada jaringan kabel.</div></div>
+      </div>
+    </div>
+  </div><!-- END MODUL 1 -->
+
+
+  <!-- ═══════════ MODUL 2 ═══════════ -->
+  <div class="module-panel" id="m2">
+    <div class="nav-tabs">
+      <button class="nav-tab active" onclick="showSection('m2','wpan',this)"><span class="dot" style="background:#10b981"></span> WPAN</button>
+      <button class="nav-tab" onclick="showSection('m2','wlan',this)"><span class="dot" style="background:#00d4ff"></span> WLAN</button>
+      <button class="nav-tab" onclick="showSection('m2','wwan',this)"><span class="dot" style="background:#f59e0b"></span> WWAN</button>
+      <button class="nav-tab" onclick="showSection('m2','generasi',this)"><span class="dot" style="background:#a78bfa"></span> Generasi Selular</button>
+      <button class="nav-tab" onclick="showSection('m2','multiple',this)"><span class="dot" style="background:#ef4444"></span> FDMA / TDMA / CDMA</button>
+      <button class="nav-tab" onclick="showSection('m2','rangkuman2',this)"><span class="dot" style="background:#f59e0b"></span> Rangkuman & Tips</button>
+    </div>
+
+    <!-- WPAN -->
+    <div class="section active" id="m2-wpan">
+      <div class="section-header">
+        <div class="section-title">📲 A. WPAN — Wireless Personal Area Network</div>
+        <div class="section-desc">Jaringan nirkabel dengan cakupan area paling sempit (~20 meter). Digunakan untuk keperluan personal dalam ruangan kecil. Data rate mencapai 2 Mbps.</div>
+      </div>
+      <div class="cards-grid">
+        <div class="card"><div class="card-icon">📏</div><div class="card-title">Jangkauan & Performa</div><div class="card-body">Cakupan: <strong style="color:#00d4ff">~20 meter</strong><br>Data rate: <strong style="color:#00d4ff">hingga 2 Mbps</strong><br>Performa: kategori sedang<br>Konsumsi daya rendah → baterai tahan lama.</div></div>
+        <div class="card"><div class="card-icon">📱</div><div class="card-title">Perangkat yang Menggunakan</div><div class="card-body">PDA, laptop, ponsel, audio headset. Aktivitas: sinkronisasi mobile dengan PC, koneksi ke printer/multimedia — menggantikan kabel tradisional.</div></div>
+        <div class="card"><div class="card-icon">🦷</div><div class="card-title">Bluetooth</div><div class="card-body">Spesifikasi industri untuk WPAN. Menghubungkan perangkat via frekuensi radio jarak dekat.<br><br>Nama dari <strong style="color:#00d4ff">Raja Harald Bluetooth</strong> — raja Denmark abad ke-10 yang dikenal sebagai diplomat pemersatu.</div></div>
+      </div>
+      <div class="section-header" style="margin-top:8px">
+        <div class="section-title" style="font-size:16px">📋 Standar IEEE 802.15 (WPAN)</div>
+        <div class="section-desc">Standar IEEE yang berfokus pada pengembangan jaringan wireless personal.</div>
+      </div>
+      <table class="mod-table">
+        <thead><tr><th>Standar</th><th>Kecepatan</th><th>Keterangan</th></tr></thead>
+        <tbody>
+          <tr><td>802.15.1</td><td>1 Mbps</td><td>Bluetooth v1.1, menggunakan FHSS (Frequency Hopping Spread Spectrum), dirilis Juni 2002</td></tr>
+          <tr><td>802.15.2</td><td>—</td><td>Beroperasi pada 2,4 GHz berdampingan dengan 802.11, mengurangi interferensi antar perangkat</td></tr>
+          <tr><td>802.15.3</td><td>11–55 Mbps</td><td>High data rate untuk multimedia & peningkatan QoS (Quality of Service)</td></tr>
+          <tr><td>802.15.4</td><td>Sangat rendah</td><td>Konsumsi daya sangat rendah, baterai tahan berbulan-bulan hingga bertahun-tahun. Contoh: otomatisasi rumah</td></tr>
+        </tbody>
+      </table>
+      <div class="highlight-box">
+        <h3>🏗️ ARSITEKTUR WPAN (4 Lapisan)</h3>
+        <p>
+          <strong style="color:#00d4ff">Lapisan Fisik</strong> → Penerima frekuensi radio (pengontrol level bawah)<br>
+          <strong style="color:#10b981">Lapisan Data Link</strong> → Sub-lapisan MAC: menghubungkan lapisan fisik & mengkonfigurasi jaringan<br>
+          <strong style="color:#a78bfa">Lapisan Network</strong> → Message routing (mencari jalan pengiriman data)<br>
+          <strong style="color:#f59e0b">Lapisan Aplikasi</strong> → Antarmuka antara pengguna dan perangkat
+        </p>
+      </div>
+    </div>
+
+    <!-- WLAN -->
+    <div class="section" id="m2-wlan">
+      <div class="section-header">
+        <div class="section-title">🌐 B. WLAN — Wireless Local Area Network</div>
+        <div class="section-desc">Jaringan nirkabel di dalam kawasan/gedung. Efektif dan menjadi tren baru pengganti jaringan kabel. Menggunakan frekuensi radio yang diatur oleh FCC dan IEEE.</div>
+      </div>
+      <div class="cards-grid">
+        <div class="card"><div class="card-icon">📡</div><div class="card-title">Access Point (AP)</div><div class="card-body">Sentral koneksi user ke ISP. Fungsi: mengkonversi sinyal RF ↔ sinyal digital. Menghubungkan jaringan wireless ke jaringan kabel.</div></div>
+        <div class="card"><div class="card-icon">🃏</div><div class="card-title">Wireless LAN Interface</div><div class="card-body">Dipasang di Mobile/Desktop PC. Tersedia dalam bentuk: <strong style="color:#00d4ff">PCMCIA card</strong>, <strong style="color:#10b981">PCI card</strong>, atau <strong style="color:#a78bfa">USB</strong>.</div></div>
+        <div class="card"><div class="card-icon">💻</div><div class="card-title">Mobile / Desktop PC</div><div class="card-body">Perangkat akses pengguna. Laptop umumnya sudah ada port PCMCIA. Desktop PC perlu tambah wireless adapter via PCI card atau USB.</div></div>
+      </div>
+      <table class="mod-table">
+        <thead><tr><th>Standar</th><th>Frekuensi</th><th>Kecepatan</th><th>Keterangan</th></tr></thead>
+        <tbody>
+          <tr><td>802.11</td><td>—</td><td>Lambat</td><td>Standar asli WLAN, light-based dan RF, dirilis 1997</td></tr>
+          <tr><td>802.11b</td><td>2,4 GHz</td><td>Lebih cepat</td><td>Transfer lebih cepat, lingkup transmisi lebih terbatas</td></tr>
+          <tr><td>802.11a</td><td>5 GHz (UNII)</td><td>Lebih cepat dari b</td><td>Lebih cepat dari 802.11b tapi kurang kompatibel</td></tr>
+          <tr><td>802.11g</td><td>2,4 GHz</td><td>Sama dengan 802.11a</td><td>Standar terbaru, kompatibel 802.11b, harga lebih murah</td></tr>
+        </tbody>
+      </table>
+      <div class="cards-grid">
+        <div class="card"><div class="card-icon">📶</div><div class="card-title">Wi-Fi</div><div class="card-body">Singkatan <strong style="color:#00d4ff">Wireless Fidelity</strong>. Standar 802.11, IEEE 1997.<br><br>Jangkauan optimal: <strong>~30,5 m</strong>. Maksimum: ~61 m.<br>Bisa open (bebas) atau closed (pakai password).</div></div>
+        <div class="card"><div class="card-icon">🔥</div><div class="card-title">Hotspot</div><div class="card-body">Area yang dilayani satu AP standar 802.11a/b/g.<br><br>3 faktor pertimbangan:<br>✦ <strong>Ukuran lokasi</strong> cakupan<br>✦ <strong>Jumlah pengguna</strong> simultan<br>✦ <strong>Model penggunaan</strong> (kampus, hotel, kafe)</div></div>
+      </div>
+    </div>
+
+    <!-- WWAN -->
+    <div class="section" id="m2-wwan">
+      <div class="section-header">
+        <div class="section-title">🗺️ C. WWAN — Wireless Wide Area Network</div>
+        <div class="section-desc">Jaringan nirkabel berskala luas (nasional) menggunakan infrastruktur wireless service carrier. Memungkinkan koneksi internet bergerak untuk perjalanan bisnis atau teknisi lapangan.</div>
+      </div>
+      <div class="range-bar-wrap">
+        <h3>📏 PERBANDINGAN JANGKAUAN JARINGAN NIRKABEL</h3>
+        <div class="range-item">
+          <div class="range-label"><span>WPAN (Bluetooth)</span><span>~20 meter</span></div>
+          <div class="range-track"><div class="range-fill" style="width:5%;background:#10b981"></div></div>
+        </div>
+        <div class="range-item">
+          <div class="range-label"><span>WLAN / Wi-Fi</span><span>~30–61 meter</span></div>
+          <div class="range-track"><div class="range-fill" style="width:20%;background:#00d4ff"></div></div>
+        </div>
+        <div class="range-item">
+          <div class="range-label"><span>WWAN (Selular)</span><span>1–50 km per sel</span></div>
+          <div class="range-track"><div class="range-fill" style="width:100%;background:#f59e0b"></div></div>
+        </div>
+      </div>
+      <div class="cards-grid">
+        <div class="card"><div class="card-icon">🏙️</div><div class="card-title">Sistem Sel (Cell)</div><div class="card-body">Sistem heksagonal seperti sarang lebah. Setiap sel: diameter <strong style="color:#00d4ff">26–32 km²</strong>, radius <strong style="color:#00d4ff">1–50 km</strong>. Base station: daya pancar <strong>800–1900 MHz</strong>.</div></div>
+        <div class="card"><div class="card-icon">🔀</div><div class="card-title">Bentuk Komunikasi WWAN</div><div class="card-body"><strong style="color:#00d4ff">Point to Point</strong> (Leased Line) — privat, contoh: telepon<br><strong style="color:#10b981">Circuit Switching</strong> — sirkuit fisik terdedikasi (ISDN)<br><strong style="color:#a78bfa">Packet Switching</strong> — share link, contoh: ATM, Frame Relay, X.25</div></div>
+        <div class="card"><div class="card-icon">📡</div><div class="card-title">Teknologi Selular yang Dipakai</div><div class="card-body">CDMA, GSM, GPRS, EDGE, 3G, HSDPA.<br><br>Alur: Komputer → Modem Wireless → Base Station → Mobile Switching Center → Internet.</div></div>
+      </div>
+    </div>
+
+    <!-- GENERASI SELULAR -->
+    <div class="section" id="m2-generasi">
+      <div class="section-header">
+        <div class="section-title">📱 Generasi Teknologi Selular</div>
+        <div class="section-desc">Perkembangan dari generasi analog hingga broadband mobile. Setiap generasi membawa peningkatan kecepatan, kapasitas, dan layanan.</div>
+      </div>
+      <div class="gen-grid">
+        <div class="gen-card g1">
+          <div class="gen-label">1G</div><div class="gen-name">Generasi Pertama (1978)</div>
+          <div class="gen-body">Sinyal <strong>analog</strong>, hanya untuk <strong>voice</strong>.<br>Modulasi: <strong>FM</strong>.<br>Dipelopori <strong style="color:#fff">AMPS</strong> (Advanced Mobile Phone Service).<br>Kapasitas terbatas, tidak ada enkripsi memadai.</div>
+        </div>
+        <div class="gen-card g2">
+          <div class="gen-label">2G</div><div class="gen-name">Generasi Kedua</div>
+          <div class="gen-body">Sinyal <strong>digital</strong> untuk voice.<br>Menggunakan <strong style="color:#10b981">FSK</strong> untuk data via AMPS.<br>Standar: <strong style="color:#fff">GSM</strong> (dikembangkan dari 1982).<br><strong>GPRS</strong>: max 172,2 Kbps<br><strong>EDGE</strong>: hingga 474 Kbps</div>
+        </div>
+        <div class="gen-card g3">
+          <div class="gen-label">3G</div><div class="gen-name">Generasi Ketiga</div>
+          <div class="gen-body">Internet wireless, video interaktif, kualitas suara CD.<br>Kecepatan setara <strong>ISDN</strong>.<br>6 kelas layanan: Voice, Messaging, Switched Data, Medium Multimedia, High Multimedia, <strong style="color:#fff">Interactive High Multimedia</strong> (video call, telepresence).</div>
+        </div>
+        <div class="gen-card g35">
+          <div class="gen-label">3.5G</div><div class="gen-name">HSDPA — Turbo 3G</div>
+          <div class="gen-body">Penyempurnaan 3G. Basis: <strong>UMTS</strong>.<br>Kecepatan: <strong style="color:#a78bfa">1.8 → 3.6 → 7.2 → 14 Mbps</strong>.<br>Diluncurkan komersial: <strong>2007</strong>.<br>Modulasi: <strong>QPSK</strong> dan <strong>16 QAM</strong>.</div>
+        </div>
+      </div>
+      <table class="mod-table">
+        <thead><tr><th>Generasi</th><th>Sinyal</th><th>Layanan</th><th>Teknologi Kunci</th><th>Kecepatan</th></tr></thead>
+        <tbody>
+          <tr><td>1G</td><td>Analog</td><td>Voice only</td><td>AMPS, FM</td><td>Sangat rendah</td></tr>
+          <tr><td>2G</td><td>Digital</td><td>Voice + SMS + Data</td><td>GSM, GPRS, EDGE, FSK</td><td>GPRS: 172 Kbps / EDGE: 474 Kbps</td></tr>
+          <tr><td>3G</td><td>Digital</td><td>Internet + Video + Multimedia</td><td>CDMA, UMTS, ISDN</td><td>Tinggi (setara ISDN)</td></tr>
+          <tr><td>3.5G</td><td>Digital</td><td>Mobile Broadband</td><td>HSDPA, QPSK, 16 QAM</td><td>1.8 – 14 Mbps</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- MULTIPLE ACCESS -->
+    <div class="section" id="m2-multiple">
+      <div class="section-header">
+        <div class="section-title">📡 Teknik Multiple Access — FDMA, TDMA, CDMA</div>
+        <div class="section-desc">Teknik agar banyak pengguna dapat berbagi satu medium komunikasi secara bersamaan tanpa saling mengganggu.</div>
+      </div>
+      <div class="ma-grid">
+        <div class="ma-card">
+          <div class="ma-analogy">🛣️</div><div class="ma-name">FDMA</div><div class="ma-full">Frequency Division Multiple Access</div>
+          <div class="ma-desc">Setiap pengguna mendapat <strong style="color:#f59e0b">pita frekuensi berbeda</strong> secara eksklusif.<br><br>Analogi: "satu pelanggan, satu jalan" — tidak bisa dipakai orang lain saat digunakan.<br><br>Digunakan pada ponsel analog <strong>1G</strong>.</div>
+        </div>
+        <div class="ma-card">
+          <div class="ma-analogy">⏱️</div><div class="ma-name">TDMA</div><div class="ma-full">Time Division Multiple Access</div>
+          <div class="ma-desc">Semua user pakai <strong style="color:#00d4ff">frekuensi yang sama</strong>, domain waktu dibagi menjadi slot-slot.<br><br>User 1 kirim di slot waktu 1, User 2 di slot waktu 2, dst.<br><br>Digunakan pada sistem digital: <strong>D-AMPS dan GSM</strong>.</div>
+        </div>
+        <div class="ma-card">
+          <div class="ma-analogy">🔐</div><div class="ma-name">CDMA</div><div class="ma-full">Code Division Multiple Access</div>
+          <div class="ma-desc">Semua user pakai <strong style="color:#a78bfa">frekuensi yang sama pada waktu yang sama</strong>, dibedakan oleh <strong>kode unik ortogonal</strong>.<br><br>Analogi: banyak pasang bicara di ruangan besar, tiap pasang pakai bahasa berbeda.<br><br>Makin banyak user → interferensi ↑ → kapasitas terbatas.</div>
+        </div>
+      </div>
+      <table class="mod-table">
+        <thead><tr><th>Teknik</th><th>Pembeda Kanal</th><th>Frekuensi</th><th>Waktu</th><th>Generasi</th></tr></thead>
+        <tbody>
+          <tr><td>FDMA</td><td>Frekuensi berbeda</td><td>Berbeda per user</td><td>Sama</td><td>1G (analog)</td></tr>
+          <tr><td>TDMA</td><td>Slot waktu berbeda</td><td>Sama</td><td>Dibagi per slot</td><td>2G digital (GSM)</td></tr>
+          <tr><td>CDMA</td><td>Kode unik</td><td>Sama</td><td>Sama</td><td>2G/3G digital</td></tr>
+        </tbody>
+      </table>
+      <div class="highlight-box">
+        <h3>💡 CONTOH PERHITUNGAN FDMA</h3>
+        <p>Jika 100 pengguna, setiap kanal lebar <strong style="color:#fff">30 kHz</strong>, mulai dari frekuensi 890 MHz:<br><br>
+        • Kanal 1: 890.000 – 890.030 MHz<br>
+        • Kanal 2: 890.030 – 890.060 MHz<br>
+        • Kanal 3: 890.060 – 890.090 MHz, dst...<br><br>
+        Total lebar = 100 × 30.000 Hz = <strong style="color:#00d4ff">3.000.000 Hz = 3 MHz</strong><br>
+        Batas atas = 890 + 3 = <strong style="color:#00d4ff">893 MHz</strong></p>
+      </div>
+    </div>
+
+    <!-- RANGKUMAN MODUL 2 -->
+    <div class="section" id="m2-rangkuman2">
+      <div class="section-header">
+        <div class="section-title">🎯 Rangkuman & Tips Ujian — Modul 2</div>
+        <div class="section-desc">Poin-poin paling penting dari Modul 2 yang sering muncul di soal ujian.</div>
+      </div>
+      <div class="keypoints">
+        <h3>🔑 POIN KUNCI MODUL 2</h3>
+        <div class="kp-item"><div class="kp-num">1</div><div>WPAN cakupan <strong style="color:#10b981">~20 meter</strong>, WLAN cakupan gedung/kawasan, WWAN cakupan <strong style="color:#f59e0b">nasional (kota/negara)</strong>.</div></div>
+        <div class="kp-item"><div class="kp-num">2</div><div>Bluetooth = standar WPAN. Nama dari <strong style="color:#00d4ff">Raja Harald Bluetooth</strong>, raja Denmark abad ke-10 yang dikenal sebagai diplomat pemersatu.</div></div>
+        <div class="kp-item"><div class="kp-num">3</div><div>802.15.4 = data rate sangat rendah, konsumsi daya rendah, baterai tahan <strong style="color:#00d4ff">berbulan-bulan hingga tahunan</strong>.</div></div>
+        <div class="kp-item"><div class="kp-num">4</div><div>Wi-Fi = Wireless Fidelity, standar 802.11 (IEEE 1997), jangkauan optimal <strong style="color:#00d4ff">~30,5 meter</strong>.</div></div>
+        <div class="kp-item"><div class="kp-num">5</div><div>802.11g = standar WLAN terbaru, kompatibel 802.11b, kecepatan sama dengan 802.11a, harga lebih murah.</div></div>
+        <div class="kp-item"><div class="kp-num">6</div><div>1G = analog (FM, voice only). 2G = digital (GSM, GPRS, EDGE, <strong style="color:#00d4ff">FSK</strong>). 3G = internet + video. 3.5G = HSDPA.</div></div>
+        <div class="kp-item"><div class="kp-num">7</div><div>GPRS max <strong style="color:#10b981">172,2 Kbps</strong> | EDGE max <strong style="color:#10b981">474 Kbps</strong> | HSDPA mencapai <strong style="color:#10b981">14 Mbps</strong>.</div></div>
+        <div class="kp-item"><div class="kp-num">8</div><div><strong style="color:#f59e0b">FDMA</strong> = frekuensi berbeda. <strong style="color:#00d4ff">TDMA</strong> = slot waktu berbeda. <strong style="color:#a78bfa">CDMA</strong> = kode unik, frekuensi & waktu sama.</div></div>
+        <div class="kp-item"><div class="kp-num">9</div><div>Sel WWAN berbentuk <strong>heksagonal</strong> seperti sarang lebah. Diameter <strong style="color:#00d4ff">26–32 km²</strong>, radius 1–50 km.</div></div>
+        <div class="kp-item"><div class="kp-num">10</div><div>HSDPA = 3.5G / Turbo 3G. Modulasi <strong style="color:#a78bfa">QPSK</strong> dan <strong style="color:#a78bfa">16 QAM</strong>. Diluncurkan komersial tahun <strong>2007</strong>.</div></div>
+      </div>
+      <div class="cards-grid">
+        <div class="card"><div class="card-icon">🧩</div><div class="card-title">Cara Mudah Ingat Jangkauan</div><div class="card-body"><strong style="color:#10b981">W</strong>PAN → <strong style="color:#10b981">P</strong>ersonal (sangat dekat ~20m)<br><strong style="color:#00d4ff">W</strong>LAN → <strong style="color:#00d4ff">L</strong>okal (gedung/kawasan)<br><strong style="color:#f59e0b">W</strong>WAN → <strong style="color:#f59e0b">W</strong>ide (kota/nasional)<br><br>P = kecil, L = sedang, W = besar!</div></div>
+        <div class="card"><div class="card-icon">📊</div><div class="card-title">Cara Mudah Ingat Multiple Access</div><div class="card-body"><strong style="color:#f59e0b">F</strong>DMA → <strong style="color:#f59e0b">F</strong>rekuensi berbeda<br><strong style="color:#00d4ff">T</strong>DMA → <strong style="color:#00d4ff">T</strong>ime (waktu) berbeda<br><strong style="color:#a78bfa">C</strong>DMA → <strong style="color:#a78bfa">C</strong>ode (kode) berbeda<br><br>Huruf pertama sebelum DMA = pembeda kanalnya!</div></div>
+        <div class="card"><div class="card-icon">📱</div><div class="card-title">Urutan Generasi Selular</div><div class="card-body">1G → Analog, suara saja (AMPS)<br>2G → Digital, suara + data (GSM/GPRS/EDGE)<br>3G → Internet + video + multimedia<br>3.5G → HSDPA, mobile broadband 14 Mbps<br><br><strong style="color:#00d4ff">Semakin tinggi generasi → semakin cepat!</strong></div></div>
+      </div>
+    </div>
+  </div><!-- END MODUL 2 -->
+
+  <footer>
+    Modul 1 & 2 — Jaringan Nirkabel &nbsp;|&nbsp; Dibuat dengan Claude AI
+  </footer>
+</div>
+
+<script>
+  function showModule(modId, btn) {
+    document.querySelectorAll('.module-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.mod-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById(modId).classList.add('active');
+    btn.classList.add('active');
+  }
+  function showSection(modId, sectionId, btn) {
+    const panel = document.getElementById(modId);
+    panel.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    panel.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+    document.getElementById(modId + '-' + sectionId).classList.add('active');
+    btn.classList.add('active');
+  }
+</script>
+</body>
+</html>
